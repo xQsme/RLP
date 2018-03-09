@@ -35,6 +35,9 @@ namespace RLP {
 			}
 		}
 	private: System::Windows::Forms::Button^  buttonRead;
+	private: System::Windows::Forms::RichTextBox^  textBox;
+
+	private: System::Windows::Forms::Label^  labelTextBox;
 	protected:
 
 	private:
@@ -51,6 +54,8 @@ namespace RLP {
 		void InitializeComponent(void)
 		{
 			this->buttonRead = (gcnew System::Windows::Forms::Button());
+			this->textBox = (gcnew System::Windows::Forms::RichTextBox());
+			this->labelTextBox = (gcnew System::Windows::Forms::Label());
 			this->SuspendLayout();
 			// 
 			// buttonRead
@@ -63,19 +68,40 @@ namespace RLP {
 			this->buttonRead->UseVisualStyleBackColor = true;
 			this->buttonRead->Click += gcnew System::EventHandler(this, &MainForm::buttonRead_Click);
 			// 
+			// textBox
+			// 
+			this->textBox->Location = System::Drawing::Point(33, 29);
+			this->textBox->Name = L"textBox";
+			this->textBox->Size = System::Drawing::Size(629, 459);
+			this->textBox->TabIndex = 1;
+			this->textBox->Text = L"";
+			// 
+			// labelTextBox
+			// 
+			this->labelTextBox->AutoSize = true;
+			this->labelTextBox->Location = System::Drawing::Point(30, 9);
+			this->labelTextBox->Name = L"labelTextBox";
+			this->labelTextBox->Size = System::Drawing::Size(38, 13);
+			this->labelTextBox->TabIndex = 2;
+			this->labelTextBox->Text = L"Nodes";
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(700, 555);
+			this->Controls->Add(this->labelTextBox);
+			this->Controls->Add(this->textBox);
 			this->Controls->Add(this->buttonRead);
 			this->Name = L"MainForm";
 			this->Text = L"MainForm";
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
 	private: System::Void buttonRead_Click(System::Object^  sender, System::EventArgs^  e) {
+		textBox->Text += 123;
 	}
 	};
 }
