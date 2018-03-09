@@ -29,9 +29,9 @@ Problem::Problem(ifstream stream)
 				int pos = 0;
 				std::stringstream iss(line);
 				while (iss >> value) {
-					nodes[idx][pos++] = value;
+					nodes[idx][pos++] = value == 0 ? 0 : 1;
 				}
-
+				idx++;
 				if (idx == total - 1) {
 					break;
 				}
