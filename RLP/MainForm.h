@@ -1,4 +1,8 @@
 #pragma once
+#include <iostream>     // std::cout
+#include <fstream>      // std::ifstream
+#include <msclr\marshal_cppstd.h>
+#include "Problem.h"
 
 namespace RLP {
 
@@ -101,7 +105,29 @@ namespace RLP {
 		}
 #pragma endregion
 	private: System::Void buttonRead_Click(System::Object^  sender, System::EventArgs^  e) {
-		textBox->Text += 123;
+		OpenFileDialog openFileDialog;
+		openFileDialog.Filter = "Text Files|*.txt";
+		openFileDialog.Title = "Select a Text File";
+		openFileDialog.ShowDialog();
+		msclr::interop::marshal_context context;
+		std::ifstream ifs(context.marshal_as<std::string>(openFileDialog.FileName) + "", std::ifstream::in);
+		if (ifs.good()) {
+			textBox->Text = "";
+			try {
+				Problem problem(ifs);
+				labelTextBox->Text = problem.getTotal() + " Nodes, " + problem.getConnections() + " Connections";
+				for (int i = 0; i < problem.getTotal(); i++) {
+					for (int j = 0; j < problem.getTotal(); j++) {
+						textBox->Text += problem.getNodes()[i][j] + " ";
+					}
+					textBox->Text += "\n";
+				}
+			}
+			catch (const std::exception& e) {
+				textBox->Text = "Error reading file, select an appropriate file.";
+				return;
+			}
+		}
 	}
 	};
 }
