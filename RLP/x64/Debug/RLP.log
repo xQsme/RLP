@@ -1,2 +1,3 @@
-﻿  Problem.cpp
+﻿  MainForm.cpp
+d:\documents\ei\2017 18\2º semestre\projeto\rlp\rlp\mainform.h(133): warning C4101: 'e': unreferenced local variable
   RLP.vcxproj -> D:\Documents\EI\2017 18\2º Semestre\Projeto\RLP\x64\Debug\RLP.exe

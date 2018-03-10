@@ -112,16 +112,23 @@ namespace RLP {
 		msclr::interop::marshal_context context;
 		std::ifstream ifs(context.marshal_as<std::string>(openFileDialog.FileName) + "", std::ifstream::in);
 		if (ifs.good()) {
-			textBox->Text = "";
+			System::String ^text;
 			try {
 				Problem problem(ifs);
 				labelTextBox->Text = problem.getTotal() + " Nodes, " + problem.getConnections() + " Connections";
+				if (problem.hasWeights() == 1) {
+					for (int j = 0; j < problem.getTotal(); j++) {
+						text += problem.getWeights()[j] + "  ";
+					}
+					text += "\n\n";
+				}
 				for (int i = 0; i < problem.getTotal(); i++) {
 					for (int j = 0; j < problem.getTotal(); j++) {
-						textBox->Text += problem.getNodes()[i][j] + " ";
+						text += problem.getNodes()[i][j] + "  ";
 					}
-					textBox->Text += "\n";
+					text += "\n";
 				}
+				textBox->Text = text;
 			}
 			catch (const std::exception& e) {
 				textBox->Text = "Error reading file, select an appropriate file.";
