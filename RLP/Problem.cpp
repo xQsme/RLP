@@ -74,9 +74,13 @@ Problem::Problem(std::ifstream& stream)
 	}
 }
 
-
 Problem::~Problem()
 {
+	delete weights;
+	for (int i = 0; i < total; i++) {
+		delete nodes[i];
+	}
+	delete nodes;
 }
 
 int **Problem::getNodes()
