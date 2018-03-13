@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>     // std::cout
 #include <fstream>      // std::ifstream
 #include <msclr\marshal_cppstd.h>
 #include "Problem.h"
