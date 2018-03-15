@@ -1,13 +1,28 @@
 #include "Problem.h"
 
-Problem::Problem(std::ifstream& stream)
+Problem::Problem() {
+
+}
+
+Problem::~Problem()
 {
-	
+	delete weights;
+	for (int i = 0; i < total; i++) {
+		delete nodes[i];
+	}
+	delete nodes;
+}
+
+void Problem::setUpProblem(std::ifstream& stream)
+{
+
 	int check = 0;
 	int done = 0;
 	int skipped = 0;
 	int count = 0;
 	int idx = 0;
+	total = 0;
+	connections = 0;
 	std::string line;
 	while (std::getline(stream, line))
 	{
@@ -18,6 +33,9 @@ Problem::Problem(std::ifstream& stream)
 				if (line.find("Weight") != -1) {
 					hasWeight = 1;
 					weights = (int*)malloc(total * sizeof(int));
+				}
+				else {
+					hasWeight = 0;
 				}
 			}
 			else if (total != 0) {
@@ -39,6 +57,7 @@ Problem::Problem(std::ifstream& stream)
 					total = stoi(line.substr(line.find("=") + 1, line.find(";") - 1));
 				}
 				nodes = (int**)malloc(sizeof(int*) * total);
+
 				for (int index = 0; index < total; ++index)
 				{
 					nodes[index] = (int*)malloc(total * sizeof(int));
@@ -72,15 +91,6 @@ Problem::Problem(std::ifstream& stream)
 			}
 		}
 	}
-}
-
-Problem::~Problem()
-{
-	delete weights;
-	for (int i = 0; i < total; i++) {
-		delete nodes[i];
-	}
-	delete nodes;
 }
 
 int **Problem::getNodes()

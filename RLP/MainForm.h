@@ -41,6 +41,7 @@ namespace RLP {
 	private: System::Windows::Forms::RichTextBox^  textBox;
 
 	private: System::Windows::Forms::Label^  labelTextBox;
+	private: Problem problem;
 	protected:
 
 	private:
@@ -113,7 +114,7 @@ namespace RLP {
 		if (ifs.good()) {
 			System::String ^text;
 			try {
-				Problem problem(ifs);
+				problem.setUpProblem(ifs);
 				labelTextBox->Text = problem.getTotal() + " Nodes, " + problem.getConnections() + " Connections";
 				if (problem.hasWeights() == 1) {
 					for (int j = 0; j < problem.getTotal(); j++) {

@@ -5,8 +5,9 @@ using namespace std;
 ref class Problem
 {
 public:
-	Problem(std::ifstream& stream);
+	Problem();
 	virtual ~Problem();
+	void setUpProblem(std::ifstream& stream);
 	int **getNodes();
 	int *getWeights();
 	int hasWeights();
