@@ -15,7 +15,11 @@ Problem::~Problem()
 
 void Problem::setUpProblem(std::ifstream& stream)
 {
-
+	free(weights);
+	for (int i = 0; i < total; i++) {
+		delete nodes[i];
+	}
+	free(nodes);
 	int check = 0;
 	int done = 0;
 	int skipped = 0;
