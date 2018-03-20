@@ -6,18 +6,18 @@ Problem::Problem() {
 
 Problem::~Problem()
 {
-	delete weights;
+	delete[] weights;
 	for (int i = 0; i < total; i++) {
-		delete nodes[i];
+		delete[] nodes[i];
 	}
-	delete nodes;
+	delete[] nodes;
 }
 
 void Problem::setUpProblem(std::ifstream& stream)
 {
 	free(weights);
 	for (int i = 0; i < total; i++) {
-		delete nodes[i];
+		delete[] nodes[i];
 	}
 	free(nodes);
 	int check = 0;
@@ -62,12 +62,13 @@ void Problem::setUpProblem(std::ifstream& stream)
 				}
 				nodes = (int**)malloc(sizeof(int*) * total);
 
-				for (int index = 0; index < total; ++index)
-				{
-					nodes[index] = (int*)malloc(total * sizeof(int));
+				for (int index = 0; index < total; ++index) {
+					{
+						nodes[index] = (int*)malloc(total * sizeof(int));
+					}
 				}
-			}
 
+			}
 		}
 		else {
 			if (done == 1 && skipped == 0) {
@@ -111,7 +112,6 @@ int Problem::hasWeights()
 {
 	return hasWeight;
 }
-
 
 int Problem::getTotal()
 {
