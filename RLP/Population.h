@@ -1,16 +1,23 @@
 #pragma once
-#include "Individual.h"
 #include <sstream>
+#include "Problem.h"
 using namespace std;
 ref class Population
 {
 public:
-	Population(int size);
+	Population();
 	void libertarMemoria();
-	Individual^ getIndividuals();
+	void setUpPopulation(int populationSize, int seed, std::ifstream& stream);
+	int** getIndividuals();
 	int getPopulationSize();
+	int getIndividualSize();
+	int getFitness();
+	int getTotal();
+	int getConnections();
 private:
-	Individual^ individuals;
+	Problem problem;
+	int** individuals;
 	int populationSize;
+	int individualSize;
 };
 

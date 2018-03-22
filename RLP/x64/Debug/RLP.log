@@ -1,5 +1,2 @@
 ﻿  MainForm.cpp
-d:\git\rlp\rlp\mainform.h(199): warning C4101: 'e': unreferenced local variable
-  Problem.cpp
-  Generating Code...
-  RLP.vcxproj -> D:\Git\RLP\x64\Debug\RLP.exe
+e:\git\rlp\rlp\mainform.h(238): error C3867: 'System::Windows::Forms::Control::DrawToBitmap': non-standard syntax; use '&' to create a pointer to member
