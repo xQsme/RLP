@@ -6,16 +6,16 @@ ref class Problem
 {
 public:
 	Problem();
-	virtual ~Problem();
+	void libertarMemoria();
 	void setUpProblem(std::ifstream& stream);
-	int **getNodes();
-	int *getWeights();
+	int** getNodes();
+	int* getWeights();
 	int hasWeights();
 	int getTotal();
 	int getConnections();
 private:
-	int **nodes;
-	int *weights;
+	int** nodes;
+	int* weights;
 	int hasWeight = 0;
 	int total=0;
 	int connections = 0;

@@ -4,7 +4,7 @@ Problem::Problem() {
 
 }
 
-Problem::~Problem()
+void Problem::libertarMemoria()
 {
 	delete[] weights;
 	for (int i = 0; i < total; i++) {

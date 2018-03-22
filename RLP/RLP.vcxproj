@@ -132,16 +132,21 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Individual.cpp" />
     <ClCompile Include="MainForm.cpp" />
+    <ClCompile Include="Population.cpp" />
     <ClCompile Include="Problem.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Individual.h" />
     <ClInclude Include="MainForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="Population.h" />
     <ClInclude Include="Problem.h" />
   </ItemGroup>
   <ItemGroup>

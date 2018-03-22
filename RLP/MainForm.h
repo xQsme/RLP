@@ -38,10 +38,19 @@ namespace RLP {
 			}
 		}
 	private: System::Windows::Forms::Button^  buttonRead;
-	private: System::Windows::Forms::RichTextBox^  textBox;
+	private: System::Windows::Forms::Label^  labelNodes;
 
-	private: System::Windows::Forms::Label^  labelTextBox;
+
+
 	private: Problem problem;
+	private: System::Windows::Forms::Label^  label1;
+	private: System::Windows::Forms::Label^  label2;
+	private: System::Windows::Forms::Label^  label3;
+	private: System::Windows::Forms::DataVisualization::Charting::Chart^  chart;
+
+	private: System::Windows::Forms::TextBox^  textBoxSeed;
+	private: System::Windows::Forms::TextBox^  textBoxPopulacao;
+	private: System::Windows::Forms::TextBox^  textBoxGeracao;
 	protected:
 
 	private:
@@ -57,48 +66,119 @@ namespace RLP {
 		/// </summary>
 		void InitializeComponent(void)
 		{
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
 			this->buttonRead = (gcnew System::Windows::Forms::Button());
-			this->textBox = (gcnew System::Windows::Forms::RichTextBox());
-			this->labelTextBox = (gcnew System::Windows::Forms::Label());
+			this->labelNodes = (gcnew System::Windows::Forms::Label());
+			this->label1 = (gcnew System::Windows::Forms::Label());
+			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->label3 = (gcnew System::Windows::Forms::Label());
+			this->chart = (gcnew System::Windows::Forms::DataVisualization::Charting::Chart());
+			this->textBoxSeed = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxPopulacao = (gcnew System::Windows::Forms::TextBox());
+			this->textBoxGeracao = (gcnew System::Windows::Forms::TextBox());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// buttonRead
 			// 
-			this->buttonRead->Location = System::Drawing::Point(12, 520);
+			this->buttonRead->Location = System::Drawing::Point(24, 105);
+			this->buttonRead->Margin = System::Windows::Forms::Padding(4);
 			this->buttonRead->Name = L"buttonRead";
-			this->buttonRead->Size = System::Drawing::Size(75, 23);
+			this->buttonRead->Size = System::Drawing::Size(100, 28);
 			this->buttonRead->TabIndex = 0;
 			this->buttonRead->Text = L"Read File";
 			this->buttonRead->UseVisualStyleBackColor = true;
 			this->buttonRead->Click += gcnew System::EventHandler(this, &MainForm::buttonRead_Click);
 			// 
-			// textBox
+			// labelNodes
 			// 
-			this->textBox->Location = System::Drawing::Point(33, 29);
-			this->textBox->Name = L"textBox";
-			this->textBox->Size = System::Drawing::Size(629, 459);
-			this->textBox->TabIndex = 1;
-			this->textBox->Text = L"";
+			this->labelNodes->AutoSize = true;
+			this->labelNodes->Location = System::Drawing::Point(179, 9);
+			this->labelNodes->Margin = System::Windows::Forms::Padding(4, 0, 4, 0);
+			this->labelNodes->Name = L"labelNodes";
+			this->labelNodes->Size = System::Drawing::Size(0, 17);
+			this->labelNodes->TabIndex = 2;
 			// 
-			// labelTextBox
+			// label1
 			// 
-			this->labelTextBox->AutoSize = true;
-			this->labelTextBox->Location = System::Drawing::Point(30, 9);
-			this->labelTextBox->Name = L"labelTextBox";
-			this->labelTextBox->Size = System::Drawing::Size(38, 13);
-			this->labelTextBox->TabIndex = 2;
-			this->labelTextBox->Text = L"Nodes";
+			this->label1->AutoSize = true;
+			this->label1->Location = System::Drawing::Point(21, 9);
+			this->label1->Name = L"label1";
+			this->label1->Size = System::Drawing::Size(41, 17);
+			this->label1->TabIndex = 3;
+			this->label1->Text = L"Seed";
+			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Location = System::Drawing::Point(21, 40);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(75, 17);
+			this->label2->TabIndex = 4;
+			this->label2->Text = L"População";
+			// 
+			// label3
+			// 
+			this->label3->AutoSize = true;
+			this->label3->Location = System::Drawing::Point(21, 71);
+			this->label3->Name = L"label3";
+			this->label3->Size = System::Drawing::Size(70, 17);
+			this->label3->TabIndex = 5;
+			this->label3->Text = L"Gerações";
+			// 
+			// chart
+			// 
+			chartArea1->Name = L"ChartArea1";
+			this->chart->ChartAreas->Add(chartArea1);
+			this->chart->Location = System::Drawing::Point(182, 31);
+			this->chart->Name = L"chart";
+			this->chart->Size = System::Drawing::Size(511, 300);
+			this->chart->TabIndex = 6;
+			this->chart->Text = L"chart";
+			// 
+			// textBoxSeed
+			// 
+			this->textBoxSeed->Location = System::Drawing::Point(102, 6);
+			this->textBoxSeed->Name = L"textBoxSeed";
+			this->textBoxSeed->Size = System::Drawing::Size(59, 22);
+			this->textBoxSeed->TabIndex = 7;
+			this->textBoxSeed->Text = L"5";
+			// 
+			// textBoxPopulacao
+			// 
+			this->textBoxPopulacao->Location = System::Drawing::Point(102, 37);
+			this->textBoxPopulacao->Name = L"textBoxPopulacao";
+			this->textBoxPopulacao->Size = System::Drawing::Size(59, 22);
+			this->textBoxPopulacao->TabIndex = 8;
+			this->textBoxPopulacao->Text = L"100";
+			// 
+			// textBoxGeracao
+			// 
+			this->textBoxGeracao->Location = System::Drawing::Point(102, 68);
+			this->textBoxGeracao->Name = L"textBoxGeracao";
+			this->textBoxGeracao->Size = System::Drawing::Size(59, 22);
+			this->textBoxGeracao->TabIndex = 9;
+			this->textBoxGeracao->Text = L"1000";
 			// 
 			// MainForm
 			// 
-			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
+			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(700, 555);
-			this->Controls->Add(this->labelTextBox);
-			this->Controls->Add(this->textBox);
+			this->ClientSize = System::Drawing::Size(707, 366);
+			this->Controls->Add(this->textBoxGeracao);
+			this->Controls->Add(this->textBoxPopulacao);
+			this->Controls->Add(this->textBoxSeed);
+			this->Controls->Add(this->chart);
+			this->Controls->Add(this->label3);
+			this->Controls->Add(this->label2);
+			this->Controls->Add(this->label1);
+			this->Controls->Add(this->labelNodes);
 			this->Controls->Add(this->buttonRead);
+			this->Margin = System::Windows::Forms::Padding(4);
 			this->Name = L"MainForm";
-			this->Text = L"MainForm";
+			this->Text = L"RLP";
+			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &MainForm::MainForm_FormClosing);
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -112,29 +192,17 @@ namespace RLP {
 		msclr::interop::marshal_context context;
 		std::ifstream ifs(context.marshal_as<std::string>(openFileDialog.FileName) + "", std::ifstream::in);
 		if (ifs.good()) {
-			System::String ^text;
 			try {
 				problem.setUpProblem(ifs);
-				labelTextBox->Text = problem.getTotal() + " Nodes, " + problem.getConnections() + " Connections";
-				if (problem.hasWeights() == 1) {
-					for (int j = 0; j < problem.getTotal(); j++) {
-						text += problem.getWeights()[j] + "  ";
-					}
-					text += "\n\n";
-				}
-				for (int i = 0; i < problem.getTotal(); i++) {
-					for (int j = 0; j < problem.getTotal(); j++) {
-						text += problem.getNodes()[i][j] + "  ";
-					}
-					text += "\n";
-				}
-				textBox->Text = text;
+				labelNodes->Text = problem.getTotal() + " Nodes, " + problem.getConnections() + " Connections";
 			}
 			catch (const std::exception& e) {
-				textBox->Text = "Error reading file, select an appropriate file.";
 				return;
 			}
 		}
 	}
-	};
+	private: System::Void MainForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
+		problem.libertarMemoria();
+	}
+};
 }
