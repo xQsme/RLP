@@ -1,5 +1,4 @@
 ﻿  MainForm.cpp
 e:\git\rlp\rlp\mainform.h(273): warning C4101: 'e': unreferenced local variable
-e:\git\rlp\rlp\mainform.h(298): warning C4244: 'argument': conversion from 'double' to '::size_t', possible loss of data
-e:\git\rlp\rlp\mainform.h(309): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+e:\git\rlp\rlp\mainform.h(298): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
   RLP.vcxproj -> E:\Git\RLP\x64\Debug\RLP.exe

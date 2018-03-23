@@ -295,39 +295,23 @@ private: System::Void buttonSolve_Click(System::Object^  sender, System::EventAr
 }
 
 private: void generateNewPopulation() {
-	int** topPercent = (int**)malloc(sizeof(int*)*SELECTION_PERCENTAGE*population.getPopulationSize());
-	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
+	int selected = SELECTION_PERCENTAGE * population.getPopulationSize();
+	int** topPercent = (int**)malloc(sizeof(int*)*selected);
+	for (int i = 0; i < selected; i++) {
 		topPercent[i] = (int*)malloc(sizeof(int)*population.getIndividualSize());
 		for (int j = 0; j < population.getIndividualSize(); j++) {
 			topPercent[i][j] = population.getIndividuals()[population.getTopPercent()[i]][j];
 		}
 	}
-	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
+	for (int i = 0; i < selected; i++) {
 		population.getIndividuals()[i] = topPercent[i];
 	}
-	int idx = 0;
-	for (int i = SELECTION_PERCENTAGE * population.getPopulationSize(); i < population.getPopulationSize(); i+=2) {
+	for (int i = selected; i < population.getPopulationSize(); i++) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
-			if (idx + 1 == SELECTION_PERCENTAGE * population.getPopulationSize()) {
-				if (i + 1 != population.getPopulationSize()) {
-					population.getIndividuals()[i + 1][j] = topPercent[idx][j];
-				}
-				population.getIndividuals()[i][j] = topPercent[idx][j];
-			}else if (rand() % 2 == 0) {
-				population.getIndividuals()[i][j] = topPercent[idx][j];
-				population.getIndividuals()[i + 1][j] = topPercent[idx + 1][j];
-			}
-			else {
-				population.getIndividuals()[i][j] = topPercent[idx+1][j];
-				population.getIndividuals()[i + 1][j] = topPercent[idx][j];
-			}
-		}
-		idx+=2;
-		if (idx >= SELECTION_PERCENTAGE * population.getPopulationSize()) {
-			idx = 0;
+			population.getIndividuals()[i][j] = topPercent[rand() % selected][j];
 		}
 	}
-	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
+	for (int i = 0; i < selected; i++) {
 		//delete[] topPercent[i];
 	}
 	//delete[] topPercent;
