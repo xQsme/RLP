@@ -32,31 +32,9 @@ void Population::setUpPopulation(int populationSize, int seed, std::ifstream& st
 	this->individualSize = problem.getTotal();
 }
 
-int** Population::getIndividuals() {
-	return individuals;
-}
-
-int Population::getTotal()
-{
-	return problem.getTotal();
-}
-
-int Population::getConnections()
-{
-	return problem.getConnections();
-}
-
-int Population::getPopulationSize() {
-	return populationSize;
-}
-
-int Population::getIndividualSize() {
-	return individualSize;
-}
-
 void Population::calculateFitness() {
 
-	int total = SELECTION_PERCENTAGE * individualSize;
+	int total = SELECTION_PERCENTAGE * populationSize;
 	free(topPercent);
 	topPercent = (int*)malloc(sizeof(int)*total);
 	int* fitnesses = (int*)malloc(sizeof(int)*populationSize);
@@ -116,10 +94,32 @@ void Population::calculateFitness() {
 	delete[] indexes;
 }
 
-int Population::getFitness() {
-	return fitness;
+int** Population::getIndividuals() {
+	return individuals;
 }
 
 int* Population::getTopPercent() {
 	return topPercent;
+}
+
+int Population::getFitness() {
+	return fitness;
+}
+
+int Population::getPopulationSize() {
+	return populationSize;
+}
+
+int Population::getIndividualSize() {
+	return individualSize;
+}
+
+int Population::getTotal()
+{
+	return problem.getTotal();
+}
+
+int Population::getConnections()
+{
+	return problem.getConnections();
 }

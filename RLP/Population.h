@@ -8,12 +8,12 @@ public:
 	Population();
 	void libertarMemoria();
 	void setUpPopulation(int populationSize, int seed, std::ifstream& stream);
+	void calculateFitness();
 	int** getIndividuals();
+	int* getTopPercent();
+	int getFitness();
 	int getPopulationSize();
 	int getIndividualSize();
-	void calculateFitness();
-	int getFitness();
-	int* getTopPercent();
 	int getTotal();
 	int getConnections();
 private:

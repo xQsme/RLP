@@ -4,6 +4,7 @@
 #include <Windows.h>
 #include "Problem.h"
 #include "Population.h"
+#include <time.h>
 #define SELECTION_PERCENTAGE 0.1
 namespace RLP {
 
@@ -42,8 +43,8 @@ namespace RLP {
 	private: System::Windows::Forms::Button^  buttonRead;
 	private: System::Windows::Forms::Label^  labelNodes;
 
-	private: Population currentPopulation;
-	private: Population nextPopulation;
+	private: Population population;
+	private: int geracao = 0;
 	private: System::Windows::Forms::Label^  label1;
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Label^  label3;
@@ -59,8 +60,8 @@ namespace RLP {
 
 
 	private: System::Windows::Forms::Button^  buttonSolve;
-	private: System::Windows::Forms::TextBox^  textBox1;
-	private: System::Windows::Forms::Label^  label4;
+
+
 	protected:
 
 	private:
@@ -76,8 +77,8 @@ namespace RLP {
 		/// </summary>
 		void InitializeComponent(void)
 		{
-			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea3 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
-			System::Windows::Forms::DataVisualization::Charting::Series^  series3 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
+			System::Windows::Forms::DataVisualization::Charting::ChartArea^  chartArea1 = (gcnew System::Windows::Forms::DataVisualization::Charting::ChartArea());
+			System::Windows::Forms::DataVisualization::Charting::Series^  series1 = (gcnew System::Windows::Forms::DataVisualization::Charting::Series());
 			this->buttonRead = (gcnew System::Windows::Forms::Button());
 			this->labelNodes = (gcnew System::Windows::Forms::Label());
 			this->label1 = (gcnew System::Windows::Forms::Label());
@@ -89,8 +90,6 @@ namespace RLP {
 			this->textBoxGenerations = (gcnew System::Windows::Forms::TextBox());
 			this->labelFitness = (gcnew System::Windows::Forms::Label());
 			this->buttonSolve = (gcnew System::Windows::Forms::Button());
-			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
-			this->label4 = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -144,15 +143,15 @@ namespace RLP {
 			// 
 			// chart
 			// 
-			chartArea3->Name = L"ChartArea1";
-			this->chart->ChartAreas->Add(chartArea3);
+			chartArea1->Name = L"ChartArea1";
+			this->chart->ChartAreas->Add(chartArea1);
 			this->chart->Location = System::Drawing::Point(136, 25);
 			this->chart->Margin = System::Windows::Forms::Padding(2);
 			this->chart->Name = L"chart";
-			series3->ChartArea = L"ChartArea1";
-			series3->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
-			series3->Name = L"RLP";
-			this->chart->Series->Add(series3);
+			series1->ChartArea = L"ChartArea1";
+			series1->ChartType = System::Windows::Forms::DataVisualization::Charting::SeriesChartType::Line;
+			series1->Name = L"RLP";
+			this->chart->Series->Add(series1);
 			this->chart->Size = System::Drawing::Size(383, 244);
 			this->chart->TabIndex = 6;
 			this->chart->Text = L"chart";
@@ -200,30 +199,13 @@ namespace RLP {
 			this->buttonSolve->TabIndex = 12;
 			this->buttonSolve->Text = L"Solve";
 			this->buttonSolve->UseVisualStyleBackColor = true;
-			// 
-			// textBox1
-			// 
-			this->textBox1->Location = System::Drawing::Point(12, 284);
-			this->textBox1->Name = L"textBox1";
-			this->textBox1->Size = System::Drawing::Size(507, 20);
-			this->textBox1->TabIndex = 13;
-			// 
-			// label4
-			// 
-			this->label4->AutoSize = true;
-			this->label4->Location = System::Drawing::Point(12, 268);
-			this->label4->Name = L"label4";
-			this->label4->Size = System::Drawing::Size(81, 13);
-			this->label4->TabIndex = 14;
-			this->label4->Text = L"Best Individuals";
+			this->buttonSolve->Click += gcnew System::EventHandler(this, &MainForm::buttonSolve_Click);
 			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(530, 318);
-			this->Controls->Add(this->label4);
-			this->Controls->Add(this->textBox1);
+			this->ClientSize = System::Drawing::Size(530, 274);
 			this->Controls->Add(this->buttonSolve);
 			this->Controls->Add(this->labelFitness);
 			this->Controls->Add(this->textBoxGenerations);
@@ -253,16 +235,13 @@ namespace RLP {
 		std::ifstream ifs(context.marshal_as<std::string>(openFileDialog.FileName) + "", std::ifstream::in);
 		if (ifs.good()) {
 			try {
-				currentPopulation.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), ifs);
-				currentPopulation.calculateFitness();
-				labelNodes->Text = currentPopulation.getTotal() + " Nodes, " + currentPopulation.getConnections() + " Connections";
-				labelFitness->Text = currentPopulation.getFitness() + " Fitness";
+				geracao = 0;
+				population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), ifs);
+				population.calculateFitness();
+				labelNodes->Text = population.getTotal() + " Nodes, " + population.getConnections() + " Connections";
+				labelFitness->Text = population.getFitness() + " Fitness";
 				chart->Series["RLP"]->Points->Clear();
-				chart->Series["RLP"]->Points->AddXY(0, currentPopulation.getFitness());
-				textBox1->Text = "";
-				for (int i = 0; i < SELECTION_PERCENTAGE*currentPopulation.getIndividualSize(); i++) {
-					textBox1->Text += currentPopulation.getTopPercent()[i] + " ";
-				}
+				chart->Series["RLP"]->Points->AddXY(geracao, population.getFitness());
 			}
 			catch (const std::exception& e) {
 				return;
@@ -270,8 +249,52 @@ namespace RLP {
 		}
 	}
 	private: System::Void MainForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
-		currentPopulation.libertarMemoria();
-		nextPopulation.libertarMemoria();
+		population.libertarMemoria();
 	}
+private: System::Void buttonSolve_Click(System::Object^  sender, System::EventArgs^  e) {
+	if (population.getIndividualSize() > 0) {
+		for (geracao; geracao <= Int32::Parse(textBoxGenerations->Text); ++geracao) {
+			generateNewPopulation();
+			population.calculateFitness();
+			labelFitness->Text = population.getFitness() + " Fitness";
+			chart->Series["RLP"]->Points->AddXY(geracao, population.getFitness());
+		}
+	}
+	else {
+		MessageBox::Show(this, "Please select a file first");
+	}
+}
+
+private: void generateNewPopulation() {
+	int** topPercent = (int**)malloc(sizeof(int*)*SELECTION_PERCENTAGE*population.getPopulationSize());
+	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
+		topPercent[i] = (int*)malloc(sizeof(int)*population.getIndividualSize());
+		topPercent[i] = population.getIndividuals()[population.getTopPercent()[i]];
+	}
+	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
+		population.getIndividuals()[i] = topPercent[i];
+	}
+	int idx = 0;
+	for (int i = SELECTION_PERCENTAGE * population.getPopulationSize(); i < SELECTION_PERCENTAGE*population.getPopulationSize()*1.5; i++) {
+		for (int j = 0; j < population.getIndividualSize(); j++) {
+			if (rand() % 2 == 0 || idx+1 >= SELECTION_PERCENTAGE * population.getPopulationSize()) {
+				population.getIndividuals()[i][j] = topPercent[idx][j];
+			}
+			else {
+				population.getIndividuals()[i][j] = topPercent[idx+1][j];
+			}
+		}
+		idx+=2;
+	}
+	for (int i = SELECTION_PERCENTAGE * population.getPopulationSize()*1.5; i < population.getPopulationSize(); i++) {
+		for (int j = 0; j < population.getIndividualSize(); j++) {
+			population.getIndividuals()[i][j] = rand() % 2;
+		}
+	}
+	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
+		//delete[] topPercent[i];
+	}
+	//delete[] topPercent;
+}
 };
 }
