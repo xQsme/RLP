@@ -32,6 +32,23 @@ void Population::setUpPopulation(int populationSize, int seed, std::ifstream& st
 	this->individualSize = problem.getTotal();
 }
 
+void Population::setUpPopulation(int populationSize, int seed) {
+	if (populationSize > 0) {
+		individuals = (int**)malloc(sizeof(int*)*populationSize);
+		if (problem.getTotal() > 0) {
+			for (int i = 0; i < populationSize; i++) {
+				individuals[i] = (int*)malloc(sizeof(int*)*problem.getTotal());
+				srand(seed += 100);
+				for (int j = 0; j < problem.getTotal(); j++) {
+					individuals[i][j] = rand() % 2;
+				}
+			}
+		}
+	}
+	this->populationSize = populationSize;
+	this->individualSize = problem.getTotal();
+}
+
 void Population::calculateFitness() {
 
 	int total = SELECTION_PERCENTAGE * populationSize;

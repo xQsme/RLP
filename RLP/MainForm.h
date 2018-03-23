@@ -279,6 +279,11 @@ namespace RLP {
 		population.libertarMemoria();
 	}
 private: System::Void buttonSolve_Click(System::Object^  sender, System::EventArgs^  e) {
+	if (geracao >= Int32::Parse(textBoxGenerations->Text)) {
+		geracao = 0;
+		population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text));
+		chart->Series["RLP"]->Points->Clear();
+	}
 	if (population.getIndividualSize() > 0) {
 		for (geracao; geracao <= Int32::Parse(textBoxGenerations->Text); ++geracao) {
 			generateNewPopulation();
@@ -304,7 +309,9 @@ private: void generateNewPopulation() {
 		}
 	}
 	for (int i = 0; i < selected; i++) {
-		population.getIndividuals()[i] = topPercent[i];
+		for (int j = 0; j < population.getIndividualSize(); j++) {
+			population.getIndividuals()[i][j] = topPercent[i][j];
+		}
 	}
 	for (int i = selected; i < population.getPopulationSize(); i++) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
@@ -312,9 +319,9 @@ private: void generateNewPopulation() {
 		}
 	}
 	for (int i = 0; i < selected; i++) {
-		//delete[] topPercent[i];
+		delete[] topPercent[i];
 	}
-	//delete[] topPercent;
+	delete[] topPercent;
 }
 };
 }
