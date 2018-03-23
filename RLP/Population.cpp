@@ -33,11 +33,15 @@ void Population::setUpPopulation(int populationSize, int seed, std::ifstream& st
 }
 
 void Population::setUpPopulation(int populationSize, int seed) {
+	for (int i = 0; i < this->populationSize; i++) {
+		free(individuals[i]);
+	}
+	free(individuals);
 	if (populationSize > 0) {
 		individuals = (int**)malloc(sizeof(int*)*populationSize);
 		if (problem.getTotal() > 0) {
 			for (int i = 0; i < populationSize; i++) {
-				individuals[i] = (int*)malloc(sizeof(int*)*problem.getTotal());
+				individuals[i] = (int*)malloc(sizeof(int*)*individualSize);
 				srand(seed += 100);
 				for (int j = 0; j < problem.getTotal(); j++) {
 					individuals[i][j] = rand() % 2;
@@ -46,16 +50,12 @@ void Population::setUpPopulation(int populationSize, int seed) {
 		}
 	}
 	this->populationSize = populationSize;
-	this->individualSize = problem.getTotal();
 }
 
 void Population::calculateFitness() {
 
 	int total = SELECTION_PERCENTAGE * populationSize;
-	free(topPercent);
-	topPercent = (int*)malloc(sizeof(int)*total);
 	int* fitnesses = (int*)malloc(sizeof(int)*populationSize);
-	int* indexes = (int*)malloc(sizeof(int)*populationSize);
 
 	int currentFitness;
 	int match;
@@ -82,7 +82,6 @@ void Population::calculateFitness() {
 			}
 		}
 		fitnesses[i] = currentFitness;
-		indexes[i] = i;
 	}
 
 	for (int i = 0; i < populationSize; i++)
@@ -92,11 +91,11 @@ void Population::calculateFitness() {
 			if (fitnesses[j] > fitnesses[j + 1])
 			{
 				int temp = fitnesses[j];
-				int tempIndex = indexes[j];
+				int* tempIndividual = individuals[j];
 				fitnesses[j] = fitnesses[j + 1];
 				fitnesses[j + 1] = temp;
-				indexes[j] = indexes[j + 1];
-				indexes[j + 1] = tempIndex;
+				individuals[j] = individuals[j + 1];
+				individuals[j + 1] = tempIndividual;
 			}
 		}
 	}
@@ -108,7 +107,7 @@ void Population::calculateFitness() {
 		match = 0;
 		for (int x = 0; x < problem.getTotal(); x++) {
 			if (problem.getNodes()[y][x] == 1) {
-				if (individuals[indexes[0]][x] == 1) {
+				if (individuals[0][x] == 1) {
 					match++;
 					break;
 				}
@@ -119,25 +118,16 @@ void Population::calculateFitness() {
 		}
 	}
 	for (int j = 0; j < individualSize; j++) {
-		if (individuals[indexes[0]][j] == 1) {
+		if (individuals[0][j] == 1) {
 			regenerators++;
 		}
 	}
 
-	for (int i = 0; i < total; i++) {
-		topPercent[i] = indexes[i];
-	}
-
 	delete[] fitnesses;
-	delete[] indexes;
 }
 
 int** Population::getIndividuals() {
 	return individuals;
-}
-
-int* Population::getTopPercent() {
-	return topPercent;
 }
 
 int Population::getFitness() {

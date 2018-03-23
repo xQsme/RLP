@@ -11,7 +11,6 @@ public:
 	void setUpPopulation(int populationSize, int seed);
 	void calculateFitness();
 	int** getIndividuals();
-	int* getTopPercent();
 	int getFitness();
 	int getDisconnected();
 	int getRegenerators();
@@ -22,7 +21,6 @@ public:
 private:
 	Problem problem;
 	int** individuals;
-	int* topPercent;
 	int fitness;
 	int disconnected;
 	int regenerators;

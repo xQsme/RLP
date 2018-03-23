@@ -301,27 +301,11 @@ private: System::Void buttonSolve_Click(System::Object^  sender, System::EventAr
 
 private: void generateNewPopulation() {
 	int selected = SELECTION_PERCENTAGE * population.getPopulationSize();
-	int** topPercent = (int**)malloc(sizeof(int*)*selected);
-	for (int i = 0; i < selected; i++) {
-		topPercent[i] = (int*)malloc(sizeof(int)*population.getIndividualSize());
-		for (int j = 0; j < population.getIndividualSize(); j++) {
-			topPercent[i][j] = population.getIndividuals()[population.getTopPercent()[i]][j];
-		}
-	}
-	for (int i = 0; i < selected; i++) {
-		for (int j = 0; j < population.getIndividualSize(); j++) {
-			population.getIndividuals()[i][j] = topPercent[i][j];
-		}
-	}
 	for (int i = selected; i < population.getPopulationSize(); i++) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
-			population.getIndividuals()[i][j] = topPercent[rand() % selected][j];
+			population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
 		}
 	}
-	for (int i = 0; i < selected; i++) {
-		delete[] topPercent[i];
-	}
-	delete[] topPercent;
 }
 };
 }
