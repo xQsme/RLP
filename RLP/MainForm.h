@@ -44,7 +44,7 @@ namespace RLP {
 	private: System::Windows::Forms::Label^  labelNodes;
 
 	private: Population population;
-	private: int geracao = 0;
+	private: int generation = 0;
 	private: System::Windows::Forms::Label^  label1;
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Label^  label3;
@@ -147,6 +147,8 @@ namespace RLP {
 			// 
 			// chart
 			// 
+			chartArea1->AxisX->Title = L"Generations";
+			chartArea1->AxisY->Title = L"Fitness";
 			chartArea1->Name = L"ChartArea1";
 			this->chart->ChartAreas->Add(chartArea1);
 			this->chart->Location = System::Drawing::Point(136, 25);
@@ -248,7 +250,7 @@ namespace RLP {
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
-
+			chart->ChartAreas[0]->AxisX->Minimum = 0;
 		}
 #pragma endregion
 	private: System::Void buttonRead_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -260,7 +262,7 @@ namespace RLP {
 		std::ifstream ifs(context.marshal_as<std::string>(openFileDialog.FileName) + "", std::ifstream::in);
 		if (ifs.good()) {
 			try {
-				geracao = 0;
+				generation = 0;
 				population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), ifs);
 				population.calculateFitness();
 				labelNodes->Text = population.getTotal() + " Nodes, " + population.getConnections() + " Connections";
@@ -268,7 +270,8 @@ namespace RLP {
 				labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
 				labelFitness->Text = "Fitness: " + population.getFitness();
 				chart->Series["RLP"]->Points->Clear();
-				chart->Series["RLP"]->Points->AddXY(geracao, population.getFitness());
+				chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+				generation++;
 			}
 			catch (const std::exception& e) {
 				return;
@@ -279,17 +282,21 @@ namespace RLP {
 		population.libertarMemoria();
 	}
 private: System::Void buttonSolve_Click(System::Object^  sender, System::EventArgs^  e) {
-	if (geracao >= Int32::Parse(textBoxGenerations->Text)) {
-		geracao = 0;
+	if (generation >= Int32::Parse(textBoxGenerations->Text) || Int32::Parse(textBoxPopulation->Text) != population.getPopulationSize()) {
+		generation = 0;
 		population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text));
+		population.calculateFitness();
 		chart->Series["RLP"]->Points->Clear();
+		chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+		generation++;
 	}
 	if (population.getIndividualSize() > 0) {
-		for (geracao; geracao <= Int32::Parse(textBoxGenerations->Text); ++geracao) {
+		for (generation; generation <= Int32::Parse(textBoxGenerations->Text); ++generation) {
 			generateNewPopulation();
 			population.calculateFitness();
-			chart->Series["RLP"]->Points->AddXY(geracao, population.getFitness());
+			chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
 		}
+		chart->ChartAreas[0]->AxisX->Maximum = generation-1;
 		labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
 		labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
 		labelFitness->Text = "Fitness: " + population.getFitness();
