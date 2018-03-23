@@ -5,7 +5,7 @@
 #include "Problem.h"
 #include "Population.h"
 #include <time.h>
-#define SELECTION_PERCENTAGE 0.1
+#define SELECTION_PERCENTAGE 0.2
 namespace RLP {
 
 	using namespace System;
@@ -60,6 +60,8 @@ namespace RLP {
 
 
 	private: System::Windows::Forms::Button^  buttonSolve;
+	private: System::Windows::Forms::Label^  labelRegenerators;
+	private: System::Windows::Forms::Label^  labelDisconnected;
 
 
 	protected:
@@ -90,6 +92,8 @@ namespace RLP {
 			this->textBoxGenerations = (gcnew System::Windows::Forms::TextBox());
 			this->labelFitness = (gcnew System::Windows::Forms::Label());
 			this->buttonSolve = (gcnew System::Windows::Forms::Button());
+			this->labelRegenerators = (gcnew System::Windows::Forms::Label());
+			this->labelDisconnected = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -186,10 +190,11 @@ namespace RLP {
 			// labelFitness
 			// 
 			this->labelFitness->AutoSize = true;
-			this->labelFitness->Location = System::Drawing::Point(48, 223);
+			this->labelFitness->Location = System::Drawing::Point(3, 252);
 			this->labelFitness->Name = L"labelFitness";
-			this->labelFitness->Size = System::Drawing::Size(0, 13);
+			this->labelFitness->Size = System::Drawing::Size(46, 13);
 			this->labelFitness->TabIndex = 11;
+			this->labelFitness->Text = L"Fitness: ";
 			// 
 			// buttonSolve
 			// 
@@ -201,11 +206,31 @@ namespace RLP {
 			this->buttonSolve->UseVisualStyleBackColor = true;
 			this->buttonSolve->Click += gcnew System::EventHandler(this, &MainForm::buttonSolve_Click);
 			// 
+			// labelRegenerators
+			// 
+			this->labelRegenerators->AutoSize = true;
+			this->labelRegenerators->Location = System::Drawing::Point(3, 229);
+			this->labelRegenerators->Name = L"labelRegenerators";
+			this->labelRegenerators->Size = System::Drawing::Size(77, 13);
+			this->labelRegenerators->TabIndex = 13;
+			this->labelRegenerators->Text = L"Regenerators: ";
+			// 
+			// labelDisconnected
+			// 
+			this->labelDisconnected->AutoSize = true;
+			this->labelDisconnected->Location = System::Drawing::Point(3, 203);
+			this->labelDisconnected->Name = L"labelDisconnected";
+			this->labelDisconnected->Size = System::Drawing::Size(79, 13);
+			this->labelDisconnected->TabIndex = 14;
+			this->labelDisconnected->Text = L"Disconnected: ";
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(530, 274);
+			this->Controls->Add(this->labelDisconnected);
+			this->Controls->Add(this->labelRegenerators);
 			this->Controls->Add(this->buttonSolve);
 			this->Controls->Add(this->labelFitness);
 			this->Controls->Add(this->textBoxGenerations);
@@ -239,7 +264,9 @@ namespace RLP {
 				population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), ifs);
 				population.calculateFitness();
 				labelNodes->Text = population.getTotal() + " Nodes, " + population.getConnections() + " Connections";
-				labelFitness->Text = population.getFitness() + " Fitness";
+				labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
+				labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
+				labelFitness->Text = "Fitness: " + population.getFitness();
 				chart->Series["RLP"]->Points->Clear();
 				chart->Series["RLP"]->Points->AddXY(geracao, population.getFitness());
 			}
@@ -256,9 +283,11 @@ private: System::Void buttonSolve_Click(System::Object^  sender, System::EventAr
 		for (geracao; geracao <= Int32::Parse(textBoxGenerations->Text); ++geracao) {
 			generateNewPopulation();
 			population.calculateFitness();
-			labelFitness->Text = population.getFitness() + " Fitness";
 			chart->Series["RLP"]->Points->AddXY(geracao, population.getFitness());
 		}
+		labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
+		labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
+		labelFitness->Text = "Fitness: " + population.getFitness();
 	}
 	else {
 		MessageBox::Show(this, "Please select a file first");
@@ -269,26 +298,33 @@ private: void generateNewPopulation() {
 	int** topPercent = (int**)malloc(sizeof(int*)*SELECTION_PERCENTAGE*population.getPopulationSize());
 	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
 		topPercent[i] = (int*)malloc(sizeof(int)*population.getIndividualSize());
-		topPercent[i] = population.getIndividuals()[population.getTopPercent()[i]];
+		for (int j = 0; j < population.getIndividualSize(); j++) {
+			topPercent[i][j] = population.getIndividuals()[population.getTopPercent()[i]][j];
+		}
 	}
 	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {
 		population.getIndividuals()[i] = topPercent[i];
 	}
 	int idx = 0;
-	for (int i = SELECTION_PERCENTAGE * population.getPopulationSize(); i < SELECTION_PERCENTAGE*population.getPopulationSize()*1.5; i++) {
+	for (int i = SELECTION_PERCENTAGE * population.getPopulationSize(); i < population.getPopulationSize(); i+=2) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
-			if (rand() % 2 == 0 || idx+1 >= SELECTION_PERCENTAGE * population.getPopulationSize()) {
+			if (idx + 1 == SELECTION_PERCENTAGE * population.getPopulationSize()) {
+				if (i + 1 != population.getPopulationSize()) {
+					population.getIndividuals()[i + 1][j] = topPercent[idx][j];
+				}
 				population.getIndividuals()[i][j] = topPercent[idx][j];
+			}else if (rand() % 2 == 0) {
+				population.getIndividuals()[i][j] = topPercent[idx][j];
+				population.getIndividuals()[i + 1][j] = topPercent[idx + 1][j];
 			}
 			else {
 				population.getIndividuals()[i][j] = topPercent[idx+1][j];
+				population.getIndividuals()[i + 1][j] = topPercent[idx][j];
 			}
 		}
 		idx+=2;
-	}
-	for (int i = SELECTION_PERCENTAGE * population.getPopulationSize()*1.5; i < population.getPopulationSize(); i++) {
-		for (int j = 0; j < population.getIndividualSize(); j++) {
-			population.getIndividuals()[i][j] = rand() % 2;
+		if (idx >= SELECTION_PERCENTAGE * population.getPopulationSize()) {
+			idx = 0;
 		}
 	}
 	for (int i = 0; i < SELECTION_PERCENTAGE*population.getPopulationSize(); i++) {

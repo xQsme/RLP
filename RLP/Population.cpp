@@ -1,5 +1,5 @@
 #include "Population.h"
-#define SELECTION_PERCENTAGE 0.1
+#define SELECTION_PERCENTAGE 0.2
 
 Population::Population() {
 
@@ -85,6 +85,27 @@ void Population::calculateFitness() {
 	}
 
 	fitness = fitnesses[0];
+	disconnected = 0;
+	regenerators = 0;
+	for (int y = 0; y < problem.getTotal(); y++) {
+		match = 0;
+		for (int x = 0; x < problem.getTotal(); x++) {
+			if (problem.getNodes()[y][x] == 1) {
+				if (individuals[indexes[0]][x] == 1) {
+					match++;
+					break;
+				}
+			}
+		}
+		if (match == 0) {
+			disconnected++;
+		}
+	}
+	for (int j = 0; j < individualSize; j++) {
+		if (individuals[indexes[0]][j] == 1) {
+			regenerators++;
+		}
+	}
 
 	for (int i = 0; i < total; i++) {
 		topPercent[i] = indexes[i];
@@ -104,6 +125,13 @@ int* Population::getTopPercent() {
 
 int Population::getFitness() {
 	return fitness;
+}
+
+int Population::getDisconnected() {
+	return disconnected;
+}
+int Population::getRegenerators() {
+	return regenerators;
 }
 
 int Population::getPopulationSize() {

@@ -12,6 +12,8 @@ public:
 	int** getIndividuals();
 	int* getTopPercent();
 	int getFitness();
+	int getDisconnected();
+	int getRegenerators();
 	int getPopulationSize();
 	int getIndividualSize();
 	int getTotal();
@@ -21,6 +23,8 @@ private:
 	int** individuals;
 	int* topPercent;
 	int fitness;
+	int disconnected;
+	int regenerators;
 	int populationSize;
 	int individualSize;
 };
