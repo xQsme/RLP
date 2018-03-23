@@ -1,4 +1,5 @@
 #include "Population.h"
+#define SELECTION_PERCENTAGE 0.1
 
 Population::Population() {
 
@@ -20,7 +21,7 @@ void Population::setUpPopulation(int populationSize, int seed, std::ifstream& st
 		if (problem.getTotal() > 0) {
 			for (int i = 0; i < populationSize; i++) {
 				individuals[i] = (int*)malloc(sizeof(int*)*problem.getTotal());
-				srand(seed++);
+				srand(seed+=100);
 				for (int j = 0; j < problem.getTotal(); j++) {
 					individuals[i][j] = rand() % 2;
 				}
@@ -53,8 +54,14 @@ int Population::getIndividualSize() {
 	return individualSize;
 }
 
-int Population::getFitness() {
-	int bestFitness = 9999999999;
+void Population::calculateFitness() {
+
+	int total = SELECTION_PERCENTAGE * individualSize;
+	free(topPercent);
+	topPercent = (int*)malloc(sizeof(int)*total);
+	int* fitnesses = (int*)malloc(sizeof(int)*populationSize);
+	int* indexes = (int*)malloc(sizeof(int)*populationSize);
+
 	int currentFitness;
 	int match;
 
@@ -79,10 +86,40 @@ int Population::getFitness() {
 				currentFitness += 100;
 			}
 		}
-		if (currentFitness < bestFitness) {
-			bestFitness = currentFitness;
+		fitnesses[i] = currentFitness;
+		indexes[i] = i;
+	}
+
+	for (int i = 0; i < populationSize; i++)
+	{
+		for (int j = 0; j < populationSize - 1; j++)
+		{
+			if (fitnesses[j] > fitnesses[j + 1])
+			{
+				int temp = fitnesses[j];
+				int tempIndex = indexes[j];
+				fitnesses[j] = fitnesses[j + 1];
+				fitnesses[j + 1] = temp;
+				indexes[j] = indexes[j + 1];
+				indexes[j + 1] = tempIndex;
+			}
 		}
 	}
 
-	return bestFitness;
+	fitness = fitnesses[0];
+
+	for (int i = 0; i < total; i++) {
+		topPercent[i] = indexes[i];
+	}
+
+	delete[] fitnesses;
+	delete[] indexes;
+}
+
+int Population::getFitness() {
+	return fitness;
+}
+
+int* Population::getTopPercent() {
+	return topPercent;
 }

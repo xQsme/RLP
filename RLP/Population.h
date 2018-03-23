@@ -11,12 +11,16 @@ public:
 	int** getIndividuals();
 	int getPopulationSize();
 	int getIndividualSize();
+	void calculateFitness();
 	int getFitness();
+	int* getTopPercent();
 	int getTotal();
 	int getConnections();
 private:
 	Problem problem;
 	int** individuals;
+	int* topPercent;
+	int fitness;
 	int populationSize;
 	int individualSize;
 };
