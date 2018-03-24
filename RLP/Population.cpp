@@ -19,9 +19,9 @@ void Population::setUpPopulation(int populationSize, int seed, std::ifstream& st
 	if (populationSize > 0) {
 		individuals = (int**)malloc(sizeof(int*)*populationSize);
 		if (problem.getTotal() > 0) {
+			srand(seed);
 			for (int i = 0; i < populationSize; i++) {
 				individuals[i] = (int*)malloc(sizeof(int*)*problem.getTotal());
-				srand(seed+=100);
 				for (int j = 0; j < problem.getTotal(); j++) {
 					individuals[i][j] = rand() % 2;
 				}
@@ -40,9 +40,9 @@ void Population::setUpPopulation(int populationSize, int seed) {
 	if (populationSize > 0) {
 		individuals = (int**)malloc(sizeof(int*)*populationSize);
 		if (problem.getTotal() > 0) {
+			srand(seed);
 			for (int i = 0; i < populationSize; i++) {
 				individuals[i] = (int*)malloc(sizeof(int*)*individualSize);
-				srand(seed += 100);
 				for (int j = 0; j < problem.getTotal(); j++) {
 					individuals[i][j] = rand() % 2;
 				}

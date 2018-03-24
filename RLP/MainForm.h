@@ -187,7 +187,7 @@ namespace RLP {
 			this->textBoxGenerations->Name = L"textBoxGenerations";
 			this->textBoxGenerations->Size = System::Drawing::Size(45, 20);
 			this->textBoxGenerations->TabIndex = 9;
-			this->textBoxGenerations->Text = L"1000";
+			this->textBoxGenerations->Text = L"50";
 			// 
 			// labelFitness
 			// 
@@ -247,10 +247,11 @@ namespace RLP {
 			this->Name = L"MainForm";
 			this->Text = L"RLP";
 			this->FormClosing += gcnew System::Windows::Forms::FormClosingEventHandler(this, &MainForm::MainForm_FormClosing);
+			this->Load += gcnew System::EventHandler(this, &MainForm::MainForm_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->EndInit();
 			this->ResumeLayout(false);
 			this->PerformLayout();
-			chart->ChartAreas[0]->AxisX->Minimum = 0;
+
 		}
 #pragma endregion
 	private: System::Void buttonRead_Click(System::Object^  sender, System::EventArgs^  e) {
@@ -313,6 +314,35 @@ private: void generateNewPopulation() {
 			population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
 		}
 	}
+	int zeroes, ones;
+	for (int j = 0; j < population.getIndividualSize(); j++) {
+		zeroes = ones = 0;
+		for (int i = 0; i < selected; i++) {
+			if (population.getIndividuals()[i][j] == 0) {
+				zeroes++;
+			}
+			else {
+				ones++;
+			}
+		}
+		if (zeroes == 0) {
+			for (int i = selected; i < population.getPopulationSize(); i++) {
+				if (rand() % 10 == 0) {
+					population.getIndividuals()[i][j] = 0;
+				}
+			}
+		}
+		if (ones == 0) {
+			for (int i = selected; i < population.getPopulationSize(); i++) {
+				if (rand() % 20 == 0) {
+					population.getIndividuals()[i][j] = 1;
+				}
+			}
+		}
+	}
+}
+private: System::Void MainForm_Load(System::Object^  sender, System::EventArgs^  e) {
+	chart->ChartAreas[0]->AxisX->Minimum = 0;
 }
 };
 }
