@@ -192,7 +192,7 @@ namespace RLP {
 			this->textBoxPopulation->Name = L"textBoxPopulation";
 			this->textBoxPopulation->Size = System::Drawing::Size(45, 20);
 			this->textBoxPopulation->TabIndex = 8;
-			this->textBoxPopulation->Text = L"500";
+			this->textBoxPopulation->Text = L"150";
 			this->textBoxPopulation->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// textBoxGenerations
@@ -202,7 +202,7 @@ namespace RLP {
 			this->textBoxGenerations->Name = L"textBoxGenerations";
 			this->textBoxGenerations->Size = System::Drawing::Size(45, 20);
 			this->textBoxGenerations->TabIndex = 9;
-			this->textBoxGenerations->Text = L"1500";
+			this->textBoxGenerations->Text = L"350";
 			this->textBoxGenerations->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// labelFitness
@@ -259,7 +259,7 @@ namespace RLP {
 			this->textBoxElitism->Name = L"textBoxElitism";
 			this->textBoxElitism->Size = System::Drawing::Size(45, 20);
 			this->textBoxElitism->TabIndex = 16;
-			this->textBoxElitism->Text = L"20";
+			this->textBoxElitism->Text = L"50";
 			this->textBoxElitism->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// labelMutation
@@ -279,7 +279,7 @@ namespace RLP {
 			this->textBoxMutation->Name = L"textBoxMutation";
 			this->textBoxMutation->Size = System::Drawing::Size(45, 20);
 			this->textBoxMutation->TabIndex = 18;
-			this->textBoxMutation->Text = L"10";
+			this->textBoxMutation->Text = L"5";
 			this->textBoxMutation->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// label4
@@ -377,14 +377,14 @@ namespace RLP {
 		}
 	}
 
-void solve() {
+private: void solve() {
 	if (generation >= Int32::Parse(textBoxGenerations->Text) || Int32::Parse(textBoxPopulation->Text) != population.getPopulationSize() || Int32::Parse(textBoxElitism->Text) != population.getElitism() * 100 || Int32::Parse(textBoxMutation->Text) != population.getMutation() * 100 || Int32::Parse(textBoxSeed->Text) != population.getSeed()) {
 		generation = 0;
 		population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), Int32::Parse(textBoxElitism->Text), Int32::Parse(textBoxMutation->Text));
 		population.calculateFitness();
-		this->Invoke(gcnew MethodInvoker(this, &MainForm::clearForm));
 		generation++;
 	}
+	this->Invoke(gcnew MethodInvoker(this, &MainForm::clearForm));
 	if (population.getIndividualSize() > 0) {
 		for (generation; generation <= Int32::Parse(textBoxGenerations->Text); ++generation) {
 			generateNewPopulation();
@@ -397,7 +397,7 @@ void solve() {
 	}
 }
 
-void disableForm() {
+private: void disableForm() {
 	textBoxElitism->Enabled = false;
 	textBoxMutation->Enabled = false;
 	textBoxGenerations->Enabled = false;
@@ -407,7 +407,7 @@ void disableForm() {
 	buttonSolve->Text = "Stop";
 }
 
-void enableForm() {
+private: void enableForm() {
 	textBoxElitism->Enabled = true;
 	textBoxMutation->Enabled = true;
 	textBoxGenerations->Enabled = true;
@@ -417,17 +417,19 @@ void enableForm() {
 	buttonSolve->Text = "Solve";
 }
 
-void alertSelectFile() {
+private: void alertSelectFile() {
 	MessageBox::Show(this, "Please select a file first");
 	enableForm();
 }
 
-void clearForm() {
+private: void clearForm() {
 	chart->Series["RLP"]->Points->Clear();
 	chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+	chart->ChartAreas[0]->AxisX->Maximum = NAN;
+	chart->ChartAreas[0]->RecalculateAxesScale();
 }
 
-void updateForm() {
+private: void updateForm() {
 	chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
 	if (generation == Int32::Parse(textBoxGenerations->Text)) {
 		chart->ChartAreas[0]->AxisX->Maximum = generation;
@@ -442,7 +444,9 @@ private: void generateNewPopulation() {
 	int selected = population.getElitism() * population.getPopulationSize();
 	for (int i = selected; i < population.getPopulationSize(); i++) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
-			population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
+			if (selected != 0) {
+				population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
+			}
 		}
 	}
 	int zeroes, ones;
