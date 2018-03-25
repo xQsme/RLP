@@ -1,5 +1,4 @@
 #include "Population.h"
-#define SELECTION_PERCENTAGE 0.2
 
 Population::Population() {
 
@@ -14,7 +13,7 @@ void Population::libertarMemoria()
 	delete[] individuals;
 }
 
-void Population::setUpPopulation(int populationSize, int seed, std::ifstream& stream) {
+void Population::setUpPopulation(int populationSize, int seed, int elitism, int mutation, std::ifstream& stream) {
 	problem.setUpProblem(stream);
 	if (populationSize > 0) {
 		individuals = (int**)malloc(sizeof(int*)*populationSize);
@@ -28,11 +27,14 @@ void Population::setUpPopulation(int populationSize, int seed, std::ifstream& st
 			}
 		}
 	}
+	this->seed = seed;
+	this->elitism = elitism * 0.01;
+	this->mutation = mutation * 0.01;
 	this->populationSize = populationSize;
 	this->individualSize = problem.getTotal();
 }
 
-void Population::setUpPopulation(int populationSize, int seed) {
+void Population::setUpPopulation(int populationSize, int seed, int elitism, int mutation) {
 	for (int i = 0; i < this->populationSize; i++) {
 		free(individuals[i]);
 	}
@@ -49,12 +51,15 @@ void Population::setUpPopulation(int populationSize, int seed) {
 			}
 		}
 	}
+	this->seed = seed;
+	this->elitism = elitism * 0.01;
+	this->mutation = mutation * 0.01;
 	this->populationSize = populationSize;
 }
 
 void Population::calculateFitness() {
 
-	int total = SELECTION_PERCENTAGE * populationSize;
+	int total = elitism * populationSize;
 	int* fitnesses = (int*)malloc(sizeof(int)*populationSize);
 
 	int currentFitness;
@@ -132,6 +137,18 @@ int** Population::getIndividuals() {
 
 int Population::getFitness() {
 	return fitness;
+}
+
+int Population::getSeed() {
+	return seed;
+}
+
+float Population::getElitism() {
+	return elitism;
+}
+
+float Population::getMutation() {
+	return mutation;
 }
 
 int Population::getDisconnected() {

@@ -4,8 +4,6 @@
 #include <Windows.h>
 #include "Problem.h"
 #include "Population.h"
-#include <time.h>
-#define SELECTION_PERCENTAGE 0.2
 namespace RLP {
 
 	using namespace System;
@@ -14,6 +12,7 @@ namespace RLP {
 	using namespace System::Windows::Forms;
 	using namespace System::Data;
 	using namespace System::Drawing;
+	using namespace System::Threading;
 
 	/// <summary>
 	/// Summary for MainForm
@@ -45,6 +44,7 @@ namespace RLP {
 
 	private: Population population;
 	private: int generation = 0;
+	private: Thread^ t = gcnew Thread(gcnew ThreadStart(this, &MainForm::solve));
 	private: System::Windows::Forms::Label^  label1;
 	private: System::Windows::Forms::Label^  label2;
 	private: System::Windows::Forms::Label^  label3;
@@ -62,6 +62,13 @@ namespace RLP {
 	private: System::Windows::Forms::Button^  buttonSolve;
 	private: System::Windows::Forms::Label^  labelRegenerators;
 	private: System::Windows::Forms::Label^  labelDisconnected;
+	private: System::Windows::Forms::Label^  labelElitism;
+	private: System::Windows::Forms::TextBox^  textBoxElitism;
+
+	private: System::Windows::Forms::Label^  labelMutation;
+	private: System::Windows::Forms::TextBox^  textBoxMutation;
+	private: System::Windows::Forms::Label^  label4;
+	private: System::Windows::Forms::Label^  label5;
 
 
 	protected:
@@ -94,12 +101,18 @@ namespace RLP {
 			this->buttonSolve = (gcnew System::Windows::Forms::Button());
 			this->labelRegenerators = (gcnew System::Windows::Forms::Label());
 			this->labelDisconnected = (gcnew System::Windows::Forms::Label());
+			this->labelElitism = (gcnew System::Windows::Forms::Label());
+			this->textBoxElitism = (gcnew System::Windows::Forms::TextBox());
+			this->labelMutation = (gcnew System::Windows::Forms::Label());
+			this->textBoxMutation = (gcnew System::Windows::Forms::TextBox());
+			this->label4 = (gcnew System::Windows::Forms::Label());
+			this->label5 = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->chart))->BeginInit();
 			this->SuspendLayout();
 			// 
 			// buttonRead
 			// 
-			this->buttonRead->Location = System::Drawing::Point(31, 86);
+			this->buttonRead->Location = System::Drawing::Point(31, 127);
 			this->buttonRead->Name = L"buttonRead";
 			this->buttonRead->Size = System::Drawing::Size(75, 23);
 			this->buttonRead->TabIndex = 0;
@@ -110,7 +123,7 @@ namespace RLP {
 			// labelNodes
 			// 
 			this->labelNodes->AutoSize = true;
-			this->labelNodes->Location = System::Drawing::Point(134, 7);
+			this->labelNodes->Location = System::Drawing::Point(141, 7);
 			this->labelNodes->Name = L"labelNodes";
 			this->labelNodes->Size = System::Drawing::Size(0, 13);
 			this->labelNodes->TabIndex = 2;
@@ -151,7 +164,7 @@ namespace RLP {
 			chartArea1->AxisY->Title = L"Fitness";
 			chartArea1->Name = L"ChartArea1";
 			this->chart->ChartAreas->Add(chartArea1);
-			this->chart->Location = System::Drawing::Point(136, 25);
+			this->chart->Location = System::Drawing::Point(144, 20);
 			this->chart->Margin = System::Windows::Forms::Padding(2);
 			this->chart->Name = L"chart";
 			series1->ChartArea = L"ChartArea1";
@@ -169,7 +182,8 @@ namespace RLP {
 			this->textBoxSeed->Name = L"textBoxSeed";
 			this->textBoxSeed->Size = System::Drawing::Size(45, 20);
 			this->textBoxSeed->TabIndex = 7;
-			this->textBoxSeed->Text = L"5";
+			this->textBoxSeed->Text = L"50";
+			this->textBoxSeed->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// textBoxPopulation
 			// 
@@ -178,7 +192,8 @@ namespace RLP {
 			this->textBoxPopulation->Name = L"textBoxPopulation";
 			this->textBoxPopulation->Size = System::Drawing::Size(45, 20);
 			this->textBoxPopulation->TabIndex = 8;
-			this->textBoxPopulation->Text = L"100";
+			this->textBoxPopulation->Text = L"500";
+			this->textBoxPopulation->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// textBoxGenerations
 			// 
@@ -187,12 +202,13 @@ namespace RLP {
 			this->textBoxGenerations->Name = L"textBoxGenerations";
 			this->textBoxGenerations->Size = System::Drawing::Size(45, 20);
 			this->textBoxGenerations->TabIndex = 9;
-			this->textBoxGenerations->Text = L"50";
+			this->textBoxGenerations->Text = L"1500";
+			this->textBoxGenerations->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
 			// 
 			// labelFitness
 			// 
 			this->labelFitness->AutoSize = true;
-			this->labelFitness->Location = System::Drawing::Point(3, 252);
+			this->labelFitness->Location = System::Drawing::Point(1, 240);
 			this->labelFitness->Name = L"labelFitness";
 			this->labelFitness->Size = System::Drawing::Size(46, 13);
 			this->labelFitness->TabIndex = 11;
@@ -200,7 +216,7 @@ namespace RLP {
 			// 
 			// buttonSolve
 			// 
-			this->buttonSolve->Location = System::Drawing::Point(31, 115);
+			this->buttonSolve->Location = System::Drawing::Point(31, 156);
 			this->buttonSolve->Name = L"buttonSolve";
 			this->buttonSolve->Size = System::Drawing::Size(75, 23);
 			this->buttonSolve->TabIndex = 12;
@@ -211,7 +227,7 @@ namespace RLP {
 			// labelRegenerators
 			// 
 			this->labelRegenerators->AutoSize = true;
-			this->labelRegenerators->Location = System::Drawing::Point(3, 229);
+			this->labelRegenerators->Location = System::Drawing::Point(1, 217);
 			this->labelRegenerators->Name = L"labelRegenerators";
 			this->labelRegenerators->Size = System::Drawing::Size(77, 13);
 			this->labelRegenerators->TabIndex = 13;
@@ -220,17 +236,83 @@ namespace RLP {
 			// labelDisconnected
 			// 
 			this->labelDisconnected->AutoSize = true;
-			this->labelDisconnected->Location = System::Drawing::Point(3, 203);
+			this->labelDisconnected->Location = System::Drawing::Point(1, 191);
 			this->labelDisconnected->Name = L"labelDisconnected";
 			this->labelDisconnected->Size = System::Drawing::Size(79, 13);
 			this->labelDisconnected->TabIndex = 14;
 			this->labelDisconnected->Text = L"Disconnected: ";
 			// 
+			// labelElitism
+			// 
+			this->labelElitism->AutoSize = true;
+			this->labelElitism->Location = System::Drawing::Point(16, 81);
+			this->labelElitism->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->labelElitism->Name = L"labelElitism";
+			this->labelElitism->Size = System::Drawing::Size(36, 13);
+			this->labelElitism->TabIndex = 15;
+			this->labelElitism->Text = L"Elitism";
+			// 
+			// textBoxElitism
+			// 
+			this->textBoxElitism->Location = System::Drawing::Point(84, 78);
+			this->textBoxElitism->Margin = System::Windows::Forms::Padding(2);
+			this->textBoxElitism->Name = L"textBoxElitism";
+			this->textBoxElitism->Size = System::Drawing::Size(45, 20);
+			this->textBoxElitism->TabIndex = 16;
+			this->textBoxElitism->Text = L"20";
+			this->textBoxElitism->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
+			// 
+			// labelMutation
+			// 
+			this->labelMutation->AutoSize = true;
+			this->labelMutation->Location = System::Drawing::Point(16, 105);
+			this->labelMutation->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->labelMutation->Name = L"labelMutation";
+			this->labelMutation->Size = System::Drawing::Size(48, 13);
+			this->labelMutation->TabIndex = 17;
+			this->labelMutation->Text = L"Mutation";
+			// 
+			// textBoxMutation
+			// 
+			this->textBoxMutation->Location = System::Drawing::Point(84, 102);
+			this->textBoxMutation->Margin = System::Windows::Forms::Padding(2);
+			this->textBoxMutation->Name = L"textBoxMutation";
+			this->textBoxMutation->Size = System::Drawing::Size(45, 20);
+			this->textBoxMutation->TabIndex = 18;
+			this->textBoxMutation->Text = L"10";
+			this->textBoxMutation->TextAlign = System::Windows::Forms::HorizontalAlignment::Right;
+			// 
+			// label4
+			// 
+			this->label4->AutoSize = true;
+			this->label4->Location = System::Drawing::Point(129, 81);
+			this->label4->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label4->Name = L"label4";
+			this->label4->Size = System::Drawing::Size(15, 13);
+			this->label4->TabIndex = 19;
+			this->label4->Text = L"%";
+			// 
+			// label5
+			// 
+			this->label5->AutoSize = true;
+			this->label5->Location = System::Drawing::Point(129, 105);
+			this->label5->Margin = System::Windows::Forms::Padding(2, 0, 2, 0);
+			this->label5->Name = L"label5";
+			this->label5->Size = System::Drawing::Size(15, 13);
+			this->label5->TabIndex = 20;
+			this->label5->Text = L"%";
+			// 
 			// MainForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(530, 274);
+			this->ClientSize = System::Drawing::Size(538, 266);
+			this->Controls->Add(this->label5);
+			this->Controls->Add(this->label4);
+			this->Controls->Add(this->textBoxMutation);
+			this->Controls->Add(this->labelMutation);
+			this->Controls->Add(this->textBoxElitism);
+			this->Controls->Add(this->labelElitism);
 			this->Controls->Add(this->labelDisconnected);
 			this->Controls->Add(this->labelRegenerators);
 			this->Controls->Add(this->buttonSolve);
@@ -264,7 +346,7 @@ namespace RLP {
 		if (ifs.good()) {
 			try {
 				generation = 0;
-				population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), ifs);
+				population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), Int32::Parse(textBoxElitism->Text), Int32::Parse(textBoxMutation->Text), ifs);
 				population.calculateFitness();
 				labelNodes->Text = population.getTotal() + " Nodes, " + population.getConnections() + " Connections";
 				labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
@@ -280,35 +362,84 @@ namespace RLP {
 		}
 	}
 	private: System::Void MainForm_FormClosing(System::Object^  sender, System::Windows::Forms::FormClosingEventArgs^  e) {
+		t->Abort();
 		population.libertarMemoria();
 	}
-private: System::Void buttonSolve_Click(System::Object^  sender, System::EventArgs^  e) {
-	if (generation >= Int32::Parse(textBoxGenerations->Text) || Int32::Parse(textBoxPopulation->Text) != population.getPopulationSize()) {
+	private: System::Void buttonSolve_Click(System::Object^  sender, System::EventArgs^  e) {
+		if (buttonSolve->Text == "Solve") {
+			disableForm();
+			t = gcnew Thread(gcnew ThreadStart(this, &MainForm::solve));
+			t->Start();
+		}
+		else {
+			enableForm();
+			t->Abort();
+		}
+	}
+
+void solve() {
+	if (generation >= Int32::Parse(textBoxGenerations->Text) || Int32::Parse(textBoxPopulation->Text) != population.getPopulationSize() || Int32::Parse(textBoxElitism->Text) != population.getElitism() * 100 || Int32::Parse(textBoxMutation->Text) != population.getMutation() * 100 || Int32::Parse(textBoxSeed->Text) != population.getSeed()) {
 		generation = 0;
-		population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text));
+		population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), Int32::Parse(textBoxElitism->Text), Int32::Parse(textBoxMutation->Text));
 		population.calculateFitness();
-		chart->Series["RLP"]->Points->Clear();
-		chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+		this->Invoke(gcnew MethodInvoker(this, &MainForm::clearForm));
 		generation++;
 	}
 	if (population.getIndividualSize() > 0) {
 		for (generation; generation <= Int32::Parse(textBoxGenerations->Text); ++generation) {
 			generateNewPopulation();
 			population.calculateFitness();
-			chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+			this->Invoke(gcnew MethodInvoker(this, &MainForm::updateForm));
 		}
-		chart->ChartAreas[0]->AxisX->Maximum = generation-1;
-		labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
-		labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
-		labelFitness->Text = "Fitness: " + population.getFitness();
 	}
 	else {
-		MessageBox::Show(this, "Please select a file first");
+		this->Invoke(gcnew MethodInvoker(this, &MainForm::alertSelectFile));
 	}
 }
 
+void disableForm() {
+	textBoxElitism->Enabled = false;
+	textBoxMutation->Enabled = false;
+	textBoxGenerations->Enabled = false;
+	textBoxSeed->Enabled = false;
+	textBoxPopulation->Enabled = false;
+	buttonRead->Enabled = false;
+	buttonSolve->Text = "Stop";
+}
+
+void enableForm() {
+	textBoxElitism->Enabled = true;
+	textBoxMutation->Enabled = true;
+	textBoxGenerations->Enabled = true;
+	textBoxSeed->Enabled = true;
+	textBoxPopulation->Enabled = true;
+	buttonRead->Enabled = true;
+	buttonSolve->Text = "Solve";
+}
+
+void alertSelectFile() {
+	MessageBox::Show(this, "Please select a file first");
+	enableForm();
+}
+
+void clearForm() {
+	chart->Series["RLP"]->Points->Clear();
+	chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+}
+
+void updateForm() {
+	chart->Series["RLP"]->Points->AddXY(generation, population.getFitness());
+	if (generation == Int32::Parse(textBoxGenerations->Text)) {
+		chart->ChartAreas[0]->AxisX->Maximum = generation;
+		enableForm();
+	}
+	labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
+	labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
+	labelFitness->Text = "Fitness: " + population.getFitness();
+}
+
 private: void generateNewPopulation() {
-	int selected = SELECTION_PERCENTAGE * population.getPopulationSize();
+	int selected = population.getElitism() * population.getPopulationSize();
 	for (int i = selected; i < population.getPopulationSize(); i++) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
 			population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
@@ -327,14 +458,14 @@ private: void generateNewPopulation() {
 		}
 		if (zeroes == 0) {
 			for (int i = selected; i < population.getPopulationSize(); i++) {
-				if (rand() % 10 == 0) {
+				if (rand() % (int)(1/population.getMutation()) == 0) {
 					population.getIndividuals()[i][j] = 0;
 				}
 			}
 		}
 		if (ones == 0) {
 			for (int i = selected; i < population.getPopulationSize(); i++) {
-				if (rand() % 20 == 0) {
+				if (rand() % (int)(1/population.getMutation()) == 0) {
 					population.getIndividuals()[i][j] = 1;
 				}
 			}
