@@ -397,6 +397,43 @@ private: void solve() {
 	}
 }
 
+private: void generateNewPopulation() {
+	int selected = population.getElitism() * population.getPopulationSize();
+	for (int i = selected; i < population.getPopulationSize(); i++) {
+		for (int j = 0; j < population.getIndividualSize(); j++) {
+			if (selected != 0) {
+				population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
+			}
+		}
+	}
+	int zeroes, ones;
+	for (int j = 0; j < population.getIndividualSize(); j++) {
+		zeroes = ones = 0;
+		for (int i = 0; i < selected; i++) {
+			if (population.getIndividuals()[i][j] == 0) {
+				zeroes++;
+			}
+			else {
+				ones++;
+			}
+		}
+		if (zeroes == 0) {
+			for (int i = selected; i < population.getPopulationSize(); i++) {
+				if (rand() % (int)(1 / population.getMutation()) == 0) {
+					population.getIndividuals()[i][j] = 0;
+				}
+			}
+		}
+		if (ones == 0) {
+			for (int i = selected; i < population.getPopulationSize(); i++) {
+				if (rand() % (int)(1 / population.getMutation()) == 0) {
+					population.getIndividuals()[i][j] = 1;
+				}
+			}
+		}
+	}
+}
+
 private: void disableForm() {
 	textBoxElitism->Enabled = false;
 	textBoxMutation->Enabled = false;
@@ -440,42 +477,6 @@ private: void updateForm() {
 	labelFitness->Text = "Fitness: " + population.getFitness();
 }
 
-private: void generateNewPopulation() {
-	int selected = population.getElitism() * population.getPopulationSize();
-	for (int i = selected; i < population.getPopulationSize(); i++) {
-		for (int j = 0; j < population.getIndividualSize(); j++) {
-			if (selected != 0) {
-				population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
-			}
-		}
-	}
-	int zeroes, ones;
-	for (int j = 0; j < population.getIndividualSize(); j++) {
-		zeroes = ones = 0;
-		for (int i = 0; i < selected; i++) {
-			if (population.getIndividuals()[i][j] == 0) {
-				zeroes++;
-			}
-			else {
-				ones++;
-			}
-		}
-		if (zeroes == 0) {
-			for (int i = selected; i < population.getPopulationSize(); i++) {
-				if (rand() % (int)(1/population.getMutation()) == 0) {
-					population.getIndividuals()[i][j] = 0;
-				}
-			}
-		}
-		if (ones == 0) {
-			for (int i = selected; i < population.getPopulationSize(); i++) {
-				if (rand() % (int)(1/population.getMutation()) == 0) {
-					population.getIndividuals()[i][j] = 1;
-				}
-			}
-		}
-	}
-}
 private: System::Void MainForm_Load(System::Object^  sender, System::EventArgs^  e) {
 	chart->ChartAreas[0]->AxisX->Minimum = 0;
 }

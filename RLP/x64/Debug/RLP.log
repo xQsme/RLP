@@ -1,4 +1,1 @@
-﻿  MainForm.cpp
-e:\git\rlp\rlp\mainform.h(359): warning C4101: 'e': unreferenced local variable
-e:\git\rlp\rlp\mainform.h(444): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-  RLP.vcxproj -> E:\Git\RLP\x64\Debug\RLP.exe
+﻿  RLP.vcxproj -> E:\Git\RLP\x64\Debug\RLP.exe
