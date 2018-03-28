@@ -1,4 +1,6 @@
-﻿  MainForm.cpp
-e:\git\rlp\rlp\mainform.h(363): warning C4101: 'e': unreferenced local variable
-e:\git\rlp\rlp\mainform.h(411): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+﻿  Population.cpp
+e:\git\rlp\rlp\population.cpp(31): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\git\rlp\rlp\population.cpp(32): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\git\rlp\rlp\population.cpp(55): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+e:\git\rlp\rlp\population.cpp(56): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   RLP.vcxproj -> E:\Git\RLP\x64\Debug\RLP.exe

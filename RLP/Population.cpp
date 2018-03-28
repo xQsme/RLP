@@ -82,7 +82,11 @@ void Population::calculateFitness() {
 		}
 		for (int j = 0; j < individualSize; j++) {
 			if (individuals[i][j] == 1) { // por cada regenerador que o invididuo tem
-				currentFitness += 100;
+				if (problem.hasWeights()) {
+					currentFitness += problem.getWeights()[j] * 100;
+				}else{
+					currentFitness += 100;
+				}
 			}
 		}
 		fitnesses[i] = currentFitness;
