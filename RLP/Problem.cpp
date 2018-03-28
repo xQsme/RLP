@@ -20,19 +20,19 @@ void Problem::setUpProblem(std::ifstream& stream)
 		delete[] nodes[i];
 	}
 	free(nodes);
-	int check = 0;
-	int done = 0;
-	int skipped = 0;
-	int count = 0;
-	int idx = 0;
+	int check = 0; //Verificar se tem pesos
+	int done = 0; //Ja leu pesos todos
+	int skipped = 0; //Ja passou a linha após ler os pesos
+	int count = 0; //Linha do ficheiro
+	int idx = 0; //Linha na matriz
 	total = 0;
 	connections = 0;
 	std::string line;
-	while (std::getline(stream, line))
+	while (std::getline(stream, line)) //Para cada linha do ficheiro
 	{
 		count++;
-		if (total == 0 || connections == 0 || check == 0) {
-			if (connections != 0) {
+		if (total == 0 || connections == 0 || check == 0) { //As 3 primeiras linhas
+			if (connections != 0) { //Verificar se tem pesos
 				check = 1;
 				if (line.find("Weight") != -1) {
 					hasWeight = 1;
@@ -42,7 +42,7 @@ void Problem::setUpProblem(std::ifstream& stream)
 					hasWeight = 0;
 				}
 			}
-			else if (total != 0) {
+			else if (total != 0) { //Total de ligações
 				if (line.find("=") == -1) {
 					throw std::invalid_argument("wrong file!");
 				}
@@ -53,8 +53,8 @@ void Problem::setUpProblem(std::ifstream& stream)
 					connections = stoi(line.substr(line.find("=") + 1, line.find(";") - 1));
 				}
 			}
-			else {
-				if (line.find(";") == -1) {
+			else { //Total de nós
+				if (line.find(";") == -1) { 
 					total = stoi(line.substr(line.find("=") + 2, line.length()));
 				}
 				else {
@@ -71,11 +71,11 @@ void Problem::setUpProblem(std::ifstream& stream)
 			}
 		}
 		else {
-			if (done == 1 && skipped == 0) {
+			if (done == 1 && skipped == 0) { //ja leu pesos e ainda nao passou linha
 				skipped = 1;
 			}
-			else {
-				if ((count > 4 && count % 2 != 0 && hasWeight == 0) || done == 1) {
+			else { //Nao tem pesos ou ja passou linha
+				if ((count > 4 && count % 2 != 0 && hasWeight == 0) || done == 1) { //Linhas impares para quando nao tem pesos, todas as linhas quando ja leu pesos
 					int value;
 					int pos = 0;
 					std::stringstream iss(line);
@@ -86,7 +86,7 @@ void Problem::setUpProblem(std::ifstream& stream)
 						break;
 					}
 				}
-				else if (hasWeight == 1) {
+				else if (hasWeight == 1) { //Ler os pesos
 					weights[idx++] = stoi(line);
 					if (idx == total) {
 						idx = 0;

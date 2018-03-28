@@ -337,17 +337,21 @@ namespace RLP {
 		}
 #pragma endregion
 	private: System::Void buttonRead_Click(System::Object^  sender, System::EventArgs^  e) {
+		//Abrir Selecionador de Ficheiro de Texto
 		OpenFileDialog openFileDialog;
 		openFileDialog.Filter = "Text Files|*.txt";
 		openFileDialog.Title = "Select a Text File";
 		openFileDialog.ShowDialog();
+		//contexto serve para converter a string do dialog para uma string que o stream aceita
 		msclr::interop::marshal_context context;
+		//instanciar o stream
 		std::ifstream ifs(context.marshal_as<std::string>(openFileDialog.FileName) + "", std::ifstream::in);
 		if (ifs.good()) {
 			try {
 				generation = 0;
 				population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), Int32::Parse(textBoxElitism->Text), Int32::Parse(textBoxMutation->Text), ifs);
 				population.calculateFitness();
+				//atualiza o form
 				labelNodes->Text = population.getTotal() + " Nodes, " + population.getConnections() + " Connections";
 				labelDisconnected->Text = "Disconnected: " + population.getDisconnected();
 				labelRegenerators->Text = "Regenerators: " + population.getRegenerators();
@@ -378,15 +382,20 @@ namespace RLP {
 	}
 
 private: void solve() {
-	if (generation >= Int32::Parse(textBoxGenerations->Text) || Int32::Parse(textBoxPopulation->Text) != population.getPopulationSize() || Int32::Parse(textBoxElitism->Text) != population.getElitism() * 100 || Int32::Parse(textBoxMutation->Text) != population.getMutation() * 100 || Int32::Parse(textBoxSeed->Text) != population.getSeed()) {
+	//Verificar se os dados da população sao diferentes do form, ou se ja chegou à ultima geração
+	//Se forem diferentes gera uma nova população
+	if (generation >= Int32::Parse(textBoxGenerations->Text) || Int32::Parse(textBoxPopulation->Text) != population.getPopulationSize() 
+		|| Int32::Parse(textBoxElitism->Text) != population.getElitism() * 100 || Int32::Parse(textBoxMutation->Text) != population.getMutation() * 100 
+		|| Int32::Parse(textBoxSeed->Text) != population.getSeed()) {
 		generation = 0;
 		population.setUpPopulation(Int32::Parse(textBoxPopulation->Text), Int32::Parse(textBoxSeed->Text), Int32::Parse(textBoxElitism->Text), Int32::Parse(textBoxMutation->Text));
 		population.calculateFitness();
 		generation++;
 	}
+	//A thread nao pode alterar o form, contudo pode pedir à outra thread para o fazer
 	this->Invoke(gcnew MethodInvoker(this, &MainForm::clearForm));
-	if (population.getIndividualSize() > 0) {
-		for (generation; generation <= Int32::Parse(textBoxGenerations->Text); ++generation) {
+	if (population.getTotal() > 0) {
+		for (generation; generation <= Int32::Parse(textBoxGenerations->Text); generation++) {
 			generateNewPopulation();
 			population.calculateFitness();
 			this->Invoke(gcnew MethodInvoker(this, &MainForm::updateForm));
@@ -398,14 +407,18 @@ private: void solve() {
 }
 
 private: void generateNewPopulation() {
+	//Selected é o indice onde acabam os individuos que foram mantidos (Elitismo), estes não são alterados
 	int selected = population.getElitism() * population.getPopulationSize();
+	//Reprodução
 	for (int i = selected; i < population.getPopulationSize(); i++) {
 		for (int j = 0; j < population.getIndividualSize(); j++) {
-			if (selected != 0) {
+			if (selected != 0) { //Para nao dividir por 0
 				population.getIndividuals()[i][j] = population.getIndividuals()[rand() % selected][j];
+				//cada nó dum individuo não selecionado, toma um valor dum nó dum individuo selecionado
 			}
 		}
 	}
+	//Mutação
 	int zeroes, ones;
 	for (int j = 0; j < population.getIndividualSize(); j++) {
 		zeroes = ones = 0;
@@ -417,18 +430,28 @@ private: void generateNewPopulation() {
 				ones++;
 			}
 		}
+		//A partir do selecionados até metade dos restantes
+		//quando naquela coluna os selecionados apenas têm 1s
 		if (zeroes == 0) {
-			for (int i = selected; i < population.getPopulationSize(); i++) {
-				if (rand() % (int)(1 / population.getMutation()) == 0) {
-					population.getIndividuals()[i][j] = 0;
+			for (int i = selected; i < (population.getPopulationSize()-selected) / 2 + selected; i++) {
+				if (rand() % (int)(1 / population.getMutation()) == 0) { //conforme a probabilidade de mutação
+					population.getIndividuals()[i][j] = 0; //alguns nós passam a 0
 				}
 			}
 		}
+		//quando naquela coluna os selecionados apenas têm 0s
 		if (ones == 0) {
-			for (int i = selected; i < population.getPopulationSize(); i++) {
+			for (int i = selected; i < (population.getPopulationSize() - selected) / 2 + selected; i++) {
 				if (rand() % (int)(1 / population.getMutation()) == 0) {
-					population.getIndividuals()[i][j] = 1;
+					population.getIndividuals()[i][j] = 1; //alguns nós passam a 1
 				}
+			}
+		}
+
+		//A partir de metade dos restantes até ao final da população
+		for (int i = (population.getPopulationSize() - selected) / 2 + selected; i < population.getPopulationSize(); i++) {
+			if (rand() % (int)(1 / population.getMutation()) == 0) { //Conforme a probabilidade de mutação
+				population.getIndividuals()[i][j] = rand() % 2; //É atribuido um valor 0 ou 1 random
 			}
 		}
 	}
